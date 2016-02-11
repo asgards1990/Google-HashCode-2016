@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1455215614 source:c:\users\corpus\desktop\google-hashcode-2016\googlehashcode2016\main.cpp
+	<iostream>
+	<fstream>
+	<string>
+	<vector>
+	<list>
+	<map>
+
