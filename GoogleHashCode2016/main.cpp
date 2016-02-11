@@ -50,7 +50,7 @@ void actionToFile(vector<vector<action_T> > vActions)
     {
         nbCommands += vActions[numDrone].size();
     }
-    outputFile << nbCommands << " " << nbDrone << " " << 142000 << "\n";
+    outputFile << nbCommands << "\n";
     for (int numDrone=0; numDrone<vActions.size(); numDrone++)
     {
 
