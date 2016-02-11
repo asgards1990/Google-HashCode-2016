@@ -44,7 +44,7 @@ static int nbProductType,nbWarehouse,nbOrder,nbDrone,nbCol,nbRow,maxPayload, nbT
 void actionToFile(vector<vector<action_T> > vActions)
 {
     ofstream outputFile;
-    outputFile.open("mother_of_all_warehouses.out");
+    outputFile.open("redundancy.out");
     int nbCommands;
     for (int numDrone=0; numDrone<vActions.size(); numDrone++)
     {
@@ -147,7 +147,7 @@ int main()
 
 
 
-    myFile.open ("mother_of_all_warehouses.in");
+    myFile.open ("redundancy.in");
     myFile >> nbRow >> nbCol >> nbDrone >> nbTurn >> maxPayload >> nbProductType;
 
     vector<int> weightOfProduct(nbProductType);
