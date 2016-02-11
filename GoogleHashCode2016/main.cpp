@@ -25,12 +25,25 @@ struct order_T
 
 
 };
+
+struct action_T
+{
+    int idDrone;
+    char actionType;
+    int idTarget;
+    int idProductType;
+    int nbProduct;
+    int time;
+};
+
+static int nbProductType,nbWarehouse,nbOrder,nbDrone,nbCol,nbRow,maxPayload, nbTurn;
+
 int main()
 {
     ifstream myFile;
     string firstLine;
     string line;
-    int nbProductType,nbWarehouse,nbOrder,nbDrone,nbCol,nbRow,maxPayload, nbTurn;
+
 
 
     myFile.open ("mother_of_all_warehouses.in");
@@ -82,4 +95,28 @@ int main()
     myFile.close();
 
     return 0;
+}
+
+
+void actionToFile(vector<action_T> vActions)
+{
+    ofstream outputFile;
+    outputFile.open("mother_of_all_warehouses.out");
+    for (int numAction=0; numAction<vActions.size(); numAction++)
+    {
+        outputFile << vActions[numAction].idDrone << " ";
+        outputFile << vActions[numAction].actionType << " ";
+        if (vActions[numAction].actionType=='W')
+            outputFile << vActions[numAction].time;
+        else
+        {
+            outputFile << vActions[numAction].idTarget << " ";
+            outputFile << vActions[numAction].idProductType << " ";
+            outputFile << vActions[numAction].nbProduct;
+        }
+
+
+        outputFile << "\n";
+    }
+    outputFile.close();
 }
