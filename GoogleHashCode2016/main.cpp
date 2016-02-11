@@ -45,6 +45,12 @@ void actionToFile(vector<vector<action_T> > vActions)
 {
     ofstream outputFile;
     outputFile.open("mother_of_all_warehouses.out");
+    int nbCommands;
+    for (int numDrone=0; numDrone<vActions.size(); numDrone++)
+    {
+        nbCommands += vActions[numDrone].size();
+    }
+    outputFile << nbCommands << " " << nbDrone << " " << 142000 << "\n";
     for (int numDrone=0; numDrone<vActions.size(); numDrone++)
     {
 
