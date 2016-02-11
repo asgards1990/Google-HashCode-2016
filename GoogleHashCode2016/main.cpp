@@ -21,7 +21,8 @@ struct order_T
     int row;
     int col;
     int nbItems;
-    vector<int> nbItemsPerType;
+    int weight;
+    map<int,int> nbByType;
 
 
 };
@@ -37,6 +38,100 @@ struct action_T
 };
 
 static int nbProductType,nbWarehouse,nbOrder,nbDrone,nbCol,nbRow,maxPayload, nbTurn;
+
+
+
+void actionToFile(vector<vector<action_T> > vActions)
+{
+    ofstream outputFile;
+    outputFile.open("mother_of_all_warehouses.out");
+    for (int numDrone=0; numDrone<vActions.size(); numDrone++)
+    {
+
+        for (int numAction=0; numAction<vActions[numDrone].size(); numAction++)
+        {
+            outputFile << vActions[numDrone][numAction].idDrone << " ";
+            outputFile << vActions[numDrone][numAction].actionType << " ";
+            if (vActions[numDrone][numAction].actionType=='W')
+                outputFile << vActions[numDrone][numAction].time;
+            else
+            {
+                outputFile << vActions[numDrone][numAction].idTarget << " ";
+                outputFile << vActions[numDrone][numAction].idProductType << " ";
+                outputFile << vActions[numDrone][numAction].nbProduct;
+            }
+
+
+            outputFile << "\n";
+        }
+
+    }
+    outputFile.close();
+}
+
+vector<action_T> orderToActions(int idOrder, vector<order_T> vOrders,vector<int> weightOfProduct,int idDrone)
+{
+    order_T order = vOrders[idOrder];
+    vector<action_T> results;
+    while (order.weight>0)
+    {
+        int accWeight(0);
+        int nbItem(0);
+        map<int,int>::iterator it(order.nbByType.begin());
+        int idProductType(it->first);
+        while (accWeight<=maxPayload-weightOfProduct[it->first])
+        {
+            accWeight += weightOfProduct[it->first];
+            order.weight -= weightOfProduct[it->first];
+            nbItem++;
+            if (it->second==1)
+            {
+                order.nbByType.erase(it->first);
+                break;
+            }
+            else
+            {
+                (it->second)--;
+            }
+        }
+        action_T load;
+        load.actionType ='L';
+        load.idDrone = idDrone;
+        load.idProductType =  idProductType;
+        load.idTarget = 0;
+        load.nbProduct = nbItem;
+        load.time = 0;
+        action_T deliver;
+        deliver.actionType ='D';
+        deliver.idDrone = idDrone;
+        deliver.idProductType =  idProductType;
+        deliver.idTarget = idOrder;
+        deliver.nbProduct = nbItem;
+        deliver.time = 0;
+        results.push_back(load);
+        results.push_back(deliver);
+
+    }
+    return results;
+}
+
+vector<vector<action_T> > initialSolution(vector<int> weightOfProduct,vector<order_T> vOrders,
+        vector<warehouse_T> vWarehouse)
+{
+    vector<vector<action_T> > droneActions (nbDrone);
+    int droneID=0;
+    cout<< nbOrder << endl;
+    for(int orderID = 0; orderID<nbOrder; orderID++)
+    {
+
+        vector<action_T> actions(orderToActions(orderID, vOrders,weightOfProduct,droneID));
+        droneActions[droneID].insert(droneActions[droneID].end(), actions.begin(), actions.end());
+        droneID = (droneID+1)%nbDrone;
+    }
+
+return droneActions;
+}
+
 
 int main()
 {
@@ -75,48 +170,27 @@ int main()
     }
 
     myFile >> nbOrder;
+    cout << nbOrder << endl;
     vector<order_T> vOrders(nbOrder);
     for (int order=0; order<nbOrder; order++)
     {
 
         myFile >> vOrders[order].row >> vOrders[order].col >>vOrders[order].nbItems;
-        vOrders[order].nbItemsPerType.resize(nbProductType);
+
 
         for (int itemNb=0; itemNb<vOrders[order].nbItems; itemNb++)
         {
             int productType(0);
             myFile >> productType;
-            vOrders[order].nbItemsPerType[productType]++;
+            vOrders[order].nbByType[productType]++;
+            vOrders[order].weight += weightOfProduct[productType];
         }
 
     }
 
 
     myFile.close();
-
+    actionToFile(initialSolution(weightOfProduct,vOrders,vWarehouse));
+//initialSolution(weightOfProduct,vOrders,vWarehouse);
     return 0;
-}
-
-
-void actionToFile(vector<action_T> vActions)
-{
-    ofstream outputFile;
-    outputFile.open("mother_of_all_warehouses.out");
-    for (int numAction=0; numAction<vActions.size(); numAction++)
-    {
-        outputFile << vActions[numAction].idDrone << " ";
-        outputFile << vActions[numAction].actionType << " ";
-        if (vActions[numAction].actionType=='W')
-            outputFile << vActions[numAction].time;
-        else
-        {
-            outputFile << vActions[numAction].idTarget << " ";
-            outputFile << vActions[numAction].idProductType << " ";
-            outputFile << vActions[numAction].nbProduct;
-        }
-
-
-        outputFile << "\n";
-    }
-    outputFile.close();
 }
